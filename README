@@ -1,0 +1,54 @@
+README:
+
+A personal backup utility based on rsync and implemented using bash script.
+
+This utility can perform incremental backup of your directory to some external
+drive. The backup script should be first configured as required by modifying
+some basic variables. The script also a special provision to exclude some 
+undesired files to be backed-up, for e.g. .obj files, Visual Studio intermediate 
+files etc.
+
+Requirements:
+
+- Cygwin is required on Windows
+- rsync must be installed for this utility to work
+
+Important Note:
+
+This utility should be used cautiously and completely at your risk. Do not blame 
+anyone else, except yourself, if any of you data is damaged or lost.
+
+Usage:
+
+- Place the 'backup' file at the same level of your working folder.
+
+- Make sure the line endings of the 'backup' script is set to Unix(LF) mode.
+
+For e.g. if 'mydir' is your working folder under Windows, 'backup' script
+should be placed under 'users' folder as shown below:
+
+   D:\
+   |
+   +--[users]
+       |
+       +---[mydir]  -->  Folder to backup
+       |
+       +---backup   -->  backup script
+       
+- Connect your external hard drive and note its drive name.
+
+- Open 'backup' script and configure the basic variables as required.
+
+    DEST_DRIVE variable should correctly point to the path of your external 
+    hard drive. For e.g. if your backup drive name is F: then you should
+    change DEST_DRIVE to /cygdrive/f.
+
+- Open Cygwin terminal and goto the directory where 'backup' script is placed.
+
+- Make sure 'backup' has an executable permission.
+
+    $ chmod +x backup
+    
+- Now, run the backup utility.
+
+    $ ./backup

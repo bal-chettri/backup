@@ -1,0 +1,90 @@
+#!/bin/sh
+
+################################################################################
+# This shell script performs an incremental backup of your directory to external 
+# drive using rsync. This tool requires cygwin on Windows.
+
+# Enable this for dry run.
+#DRY_RUN="--dry-run"
+
+# Root folder to backup. Change this to your folder name on your local system.
+# Usually, this should be at the same level of this shell script.
+SRC_PATH=./mydir
+
+# Destination path for the backup(change this to point to your external 
+# hard drive)
+DEST_DRIVE=/cygdrive/k
+
+# Root folder under DEST_DRIVE where backup will be made(this folder 
+# will be created if it doesn't exist)
+BACKUP_ROOT=backups
+
+# Final destination path for backup target(do not modify this)
+DEST_PATH=$DEST_DRIVE/$BACKUP_ROOT
+
+# Log file to generate
+LOG_FILE=backup.log
+################################################################################
+
+# Check for a valid destination drive
+if [ -d $DEST_DRIVE ]; then
+    echo "Destination drive $DEST_DRIVE is valid." 
+else
+    echo "Destination drive $DEST_DRIVE is not valid." 
+    exit 1
+fi
+
+# Check for a valid backup root directory
+if [ -d $DEST_PATH ]; then
+    echo "Backup root directory '$BACKUP_ROOT' found." 
+else
+    echo "Creating backup root directory '$BACKUP_ROOT'."
+    mkdir -p $DEST_PATH
+fi
+
+# Rename backup.log
+if [ -f backup.log ]; then    
+    mv backup.log backup.log.old
+fi
+
+# Always excludes these file types.
+EXCLUDES=\
+"*.log *.tmp "\
+"*.o *.o.d *.obj *.exe.embed.manifest *.exe.intermediate.manifest *_manifest.rc "\
+"*.vcxprojResolveAssemblyReference.cache *.sdf *.ipch *.tlog *.lastbuildstate "\
+"*.pdb *.idb *.ilk *.ncb *.dep *.res *.i BuildLog.htm "\
+"*.class *.d *.dex *.dex.d *.unaligned.apk *.ap_ "\
+"*.pyc "\
+"*.DS_Store"
+
+EXCLUDES_ALL=""
+for excl in $EXCLUDES; do
+    EXCLUDES_ALL="$EXCLUDES_ALL --exclude=$excl"
+done
+
+OPTIONS="-vrpt --force --delete --log-file=$LOG_FILE $EXCLUDES_ALL $DRY_RUN"
+
+# Append additional options passed in command line
+while [ "$1" != "" ]; do
+    OPTIONS="$OPTIONS$1 "
+    shift
+done
+
+echo ""
+echo "rsync $OPTIONS $SRC_PATH $DEST_PATH" 
+echo ""
+read -n1 -r -p "Press any key to continue or Ctrl+C to exit."
+
+echo ""
+echo "Running backup..."
+START_TIME=`date`
+rsync $OPTIONS $SRC_PATH $DEST_PATH
+
+BACKUP_LAST_FILE=`echo $SRC_PATH | tr -d "."`
+BACKUP_LAST_FILE=`echo $BACKUP_LAST_FILE | tr "/" "_"`
+touch $DEST_PATH/backup$BACKUP_LAST_FILE.last
+cp backup.log $DEST_PATH/backup$BACKUP_LAST_FILE.log
+
+echo ""
+echo "Backup started at $START_TIME"
+echo "Backup completed at `date`"
