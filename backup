@@ -45,6 +45,34 @@ DEST_PATH=$DEST_DRIVE/$BACKUP_ROOT
 LOG_FILE=backup.log
 ################################################################################
 
+# Show a list of available drives
+drives=`cut -d ' ' -f 2 /etc/mtab`
+menu=""
+for drive in $drives; do
+    if [ $drive == "/" ]; then
+        continue
+    fi
+    if [ $(echo $drive | cut -c -5) == "/usr/" ]; then
+        continue
+    fi
+    menu="$menu $drive"
+done
+menu="$menu Exit"
+PS3="? "
+echo "Select the target location for the backup."
+select DEST_DRIVE in $menu
+do
+    break
+done
+if [ -z $DEST_DRIVE ]; then
+    echo "Invalid selection."
+    exit 0
+fi
+if [ $DEST_DRIVE == "Exit" ]; then
+    exit 0
+fi
+DEST_PATH=$DEST_DRIVE/$BACKUP_ROOT
+
 # Check for a valid destination drive
 if [ -d $DEST_DRIVE ]; then
     echo "Destination drive $DEST_DRIVE is valid." 
@@ -52,6 +80,17 @@ else
     echo "Destination drive $DEST_DRIVE is not valid." 
     exit 1
 fi
+
+# Confirm the destination path before proceeding
+echo "Backup will be saved at $DEST_PATH."
+read -p "Type \"Yes\" to proceed or \"No\" to exit. " opt
+if [ -z $opt ]; then
+    exit 0
+fi
+if [ $opt != "Yes" ]; then
+    exit 0
+fi
+echo ""
 
 # Check for a valid backup root directory
 if [ -d $DEST_PATH ]; then
@@ -62,7 +101,7 @@ else
 fi
 
 # Rename backup.log
-if [ -f backup.log ]; then    
+if [ -f backup.log ]; then
     mv backup.log backup.log.old
 fi
 
@@ -92,7 +131,7 @@ done
 echo ""
 echo "rsync $OPTIONS $SRC_PATH $DEST_PATH" 
 echo ""
-read -n1 -r -p "Press any key to continue or Ctrl+C to exit."
+read -n1 -r -p "Press any key to continue or Ctrl+C to exit. "
 
 echo ""
 echo "Running backup..."
