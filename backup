@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 # Copyright 2017, Bal Chettri
 #
@@ -46,32 +46,34 @@ LOG_FILE=backup.log
 ################################################################################
 
 # Show a list of available drives
-drives=`cut -d ' ' -f 2 /etc/mtab`
-menu=""
-for drive in $drives; do
-    if [ $drive == "/" ]; then
-        continue
+if [ -r /etc/mtab ]; then
+    drives=`cut -d ' ' -f 2 /etc/mtab`
+    menu=""
+    for drive in $drives; do
+        if [ $drive = "/" ]; then
+            continue
+        fi
+        if [ $(echo $drive | cut -c -5) = "/usr/" ]; then
+            continue
+        fi
+        menu="$menu $drive"
+    done
+    menu="$menu Exit"
+    PS3="? "
+    echo "Select the target location for the backup."
+    select DEST_DRIVE in $menu
+    do
+        break
+    done
+    if [ -z $DEST_DRIVE ]; then
+        echo "Invalid selection."
+        exit 0
     fi
-    if [ $(echo $drive | cut -c -5) == "/usr/" ]; then
-        continue
+    if [ $DEST_DRIVE = "Exit" ]; then
+        exit 0
     fi
-    menu="$menu $drive"
-done
-menu="$menu Exit"
-PS3="? "
-echo "Select the target location for the backup."
-select DEST_DRIVE in $menu
-do
-    break
-done
-if [ -z $DEST_DRIVE ]; then
-    echo "Invalid selection."
-    exit 0
+    DEST_PATH=$DEST_DRIVE/$BACKUP_ROOT
 fi
-if [ $DEST_DRIVE == "Exit" ]; then
-    exit 0
-fi
-DEST_PATH=$DEST_DRIVE/$BACKUP_ROOT
 
 # Check for a valid destination drive
 if [ -d $DEST_DRIVE ]; then
