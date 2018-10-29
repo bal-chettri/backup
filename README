@@ -3,10 +3,8 @@ README:
 A personal backup utility based on rsync and implemented using bash script.
 
 This utility can perform incremental backup of your directory to some external
-drive. The backup script should be first configured as required by modifying
-some basic variables. The script also a special provision to exclude some 
-undesired files to be backed-up, for e.g. .obj files, Visual Studio intermediate 
-files etc.
+drive. The script also a special provision to exclude some undesired files to be
+backed-up, for e.g. .obj files, Visual Studio intermediate files etc.
 
 Requirements:
 
@@ -15,14 +13,17 @@ Requirements:
 
 Important Note:
 
-This utility should be used cautiously and completely at your risk. Do not blame 
-anyone else, except yourself, if any of you data is damaged or lost.
+This utility does not come with any warranty and should be used cautiously and
+completely at your own risk.
 
 Usage:
 
-- Place the 'backup' file at the same level of your working folder.
-
 - Make sure the line endings of the 'backup' script is set to Unix(LF) mode.
+
+- Make sure the 'backup' script has executable permission.
+  $ chmod +x backup
+
+- Place the 'backup' file at the same level of your working folder.
 
 For e.g. if 'mydir' is your working folder under Windows, 'backup' script
 should be placed under 'users' folder as shown below:
@@ -35,20 +36,24 @@ should be placed under 'users' folder as shown below:
        |
        +---backup   -->  backup script
        
+- Edit the 'backup' script and configure the basic variables as required.
+
+    SRC_PATH:
+    Points to the name of your source directory to backup.
+    
+    BACKUP_ROOT:
+    Root folder under destination drive where backup will be made(this folder 
+    will be created if required)
+    
+    LOG_FILE:
+    Name of the log file generated.
+
 - Connect your external hard drive and note its drive name.
 
-- Open 'backup' script and configure the basic variables as required.
-
-    DEST_DRIVE variable should correctly point to the path of your external 
-    hard drive. For e.g. if your backup drive name is F: then you should
-    change DEST_DRIVE to /cygdrive/f.
-
 - Open Cygwin terminal and goto the directory where 'backup' script is placed.
-
-- Make sure 'backup' has an executable permission.
-
-    $ chmod +x backup
     
 - Now, run the backup utility.
 
     $ ./backup
+
+- From the menu, select the destination drive where you want to backup and continue.
