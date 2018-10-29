@@ -30,16 +30,9 @@
 # Usually, this should be at the same level of this shell script.
 SRC_PATH=./mydir
 
-# Destination path for the backup(change this to point to your external 
-# hard drive)
-DEST_DRIVE=/cygdrive/k
-
-# Root folder under DEST_DRIVE where backup will be made(this folder 
+# Root folder under destination drive where backup will be made(this folder
 # will be created if it doesn't exist)
 BACKUP_ROOT=backups
-
-# Final destination path for backup target(do not modify this)
-DEST_PATH=$DEST_DRIVE/$BACKUP_ROOT
 
 # Log file to generate
 LOG_FILE=backup.log
@@ -73,6 +66,9 @@ if [ -r /etc/mtab ]; then
         exit 0
     fi
     DEST_PATH=$DEST_DRIVE/$BACKUP_ROOT
+else
+    echo "Failed to read drives."
+    exit -1
 fi
 
 # Check for a valid destination drive
