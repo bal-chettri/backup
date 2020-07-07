@@ -134,6 +134,7 @@ read -n1 -r -p "Press any key to continue or Ctrl+C to exit. "
 echo ""
 echo "Running backup..."
 START_TIME=`date`
+START_TIMESTAMP=`date +%s`
 rsync $OPTIONS $SRC_PATH $DEST_PATH
 
 BACKUP_LAST_FILE=`echo $SRC_PATH | tr -d "."`
@@ -144,3 +145,9 @@ cp backup.log $DEST_PATH/backup$BACKUP_LAST_FILE.log
 echo ""
 echo "Backup started at $START_TIME"
 echo "Backup completed at `date`"
+
+END_TIMESTAMP=`date +%s`
+TOTAL_TIME=`expr $END_TIMESTAMP - $START_TIMESTAMP`
+TOTAL_TIME_MINS=`expr $TOTAL_TIME / 60`
+TOTAL_TIME_SECS=`expr $TOTAL_TIME % 60`
+echo "Backup took $TOTAL_TIME_MINS min(s) $TOTAL_TIME_SECS sec(s)"
