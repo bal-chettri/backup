@@ -3,8 +3,9 @@ README:
 A personal backup utility based on rsync and implemented using bash script.
 
 This utility can perform incremental backup of your directory to some external
-drive. The script also a special provision to exclude some undesired files to be
-backed-up, for e.g. .obj files, Visual Studio intermediate files etc.
+drive. The script has a provision to exclude undesired files and directories
+via external file "backup-ignore", for example, .obj files, temporary and
+intermediate files generated on your system.
 
 Requirements:
 
@@ -21,37 +22,49 @@ Usage:
 - Make sure the line endings of the 'backup' script is set to Unix(LF) mode.
 
 - Make sure the 'backup' script has executable permission.
-  $ chmod +x backup
+  $ chmod +x ./backup
 
 - Place the 'backup' file at the same level of your working folder.
 
-For e.g. if 'mydir' is your working folder under Windows, 'backup' script
-should be placed under 'users' folder as shown below:
+For e.g. if 'mydir' is your main working directory, 'backup' script should be placed
+under 'user' directory as shown below:
 
-   D:\
+   / [root]
    |
-   +--[users]
+   +--[home]
        |
-       +---[mydir]  -->  Folder to backup
-       |
-       +---backup   -->  backup script
-       
-- Edit the 'backup' script and configure the basic variables as required.
+       +---[user]
+            |
+            +---[mydir]  -->  Folder to backup
+            |
+            +---backup   -->  backup script
 
-    SRC_PATH:
-    Points to the name of your source directory to backup.
-    
+- Edit the 'backup' script and configure basic variables as required.
+
+    SRC_PATH(required):
+    Points to the name of your source directory to backup, for e.g. "./mydir".
+
     BACKUP_ROOT:
-    Root folder under destination drive where backup will be made(this folder 
+    Root folder under destination drive where backup will be made(this folder
     will be created if required)
-    
+
     LOG_FILE:
     Name of the log file generated.
 
-- Connect your external hard drive and note its drive name.
+- Create a file named "backup-ignore" at the same directory where the backup script
+  is placed. Edit the file to specify all files / directories that must be excluded
+  from backup as shown below, for example.
 
-- Open Cygwin terminal and goto the directory where 'backup' script is placed.
-    
+  *.obj
+  *.class
+  *.dex
+  mydir/proj/build
+
+- Connect your external hard drive and note its drive name or path.
+
+- Goto directory where 'backup' script is installed.
+    $ cd ~
+
 - Now, run the backup utility.
 
     $ ./backup
