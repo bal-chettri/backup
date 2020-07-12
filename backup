@@ -36,6 +36,9 @@ BACKUP_ROOT=backups
 
 # Log file to generate
 LOG_FILE=backup.log
+
+# Backup ignore list file
+IGNORE_LIST_FILE=backup-ignore
 ################################################################################
 
 # Show a list of available drives
@@ -103,26 +106,40 @@ if [ -f backup.log ]; then
     mv backup.log backup.log.old
 fi
 
-# Always excludes these file types.
+# Always exclude these file types. More excludes may be specified in "backup-ignore"
+# file in the same directory of this script.
 EXCLUDES=\
-"*.log *.tmp "\
-"*.o *.o.d *.obj *.exe.embed.manifest *.exe.intermediate.manifest *_manifest.rc "\
-"*.vcxprojResolveAssemblyReference.cache *.sdf *.ipch *.tlog *.lastbuildstate "\
-"*.pdb *.idb *.ilk *.ncb *.dep *.res *.i BuildLog.htm "\
-"*.class *.d *.dex *.dex.d *.unaligned.apk *.ap_ "\
-"*.pyc "\
-"*.DS_Store"
+"*.log "\
+"*.tmp "\
+"*.o "\
+"*.obj "\
+"*.DS_Store "\
+".git "\
+".svn"
 
 EXCLUDES_ALL=""
 for excl in $EXCLUDES; do
     EXCLUDES_ALL="$EXCLUDES_ALL --exclude=$excl"
 done
 
-OPTIONS="-vrpt --force --delete --log-file=$LOG_FILE $EXCLUDES_ALL $DRY_RUN"
+# Build options to rsync
+OPTIONS="-vrpt --force --delete --delete-excluded --log-file=$LOG_FILE $EXCLUDES_ALL"
+
+# Specify excludes from ignore list file, if it exists.
+if [ -f $IGNORE_LIST_FILE ]
+then
+    OPTIONS="$OPTIONS --exclude-from=$IGNORE_LIST_FILE"
+fi
+
+# Specify dry run if defined.
+if [ ! -z $DRY_RUN ]
+then
+    OPTIONS="$OPTIONS $DRY_RUN"
+fi
 
 # Append additional options passed in command line
 while [ "$1" != "" ]; do
-    OPTIONS="$OPTIONS$1 "
+    OPTIONS="$OPTIONS $1"
     shift
 done
 
